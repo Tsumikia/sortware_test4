@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>天气信息</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        /* 新增样式：将表格宽度固定，添加边框和居中显示 */
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <center>
+        <label for="regions">选择地区:</label>
+        <select id="regions" v-model="selectedRegion" @change="getCityList">
+            <option v-for="region in regions" :value="region.code">{{ region.name }}</option>
+        </select>
+
+        <!-- 新增代码：使用容器包裹城市列表 -->
+        <div id="cities-container">
+            <label for="cities">选择城市:</label>
+            <select id="cities" v-model="selectedCity" @change="getWeatherByCityCode">
+                <option v-for="(code, name) in cities" :value="code">{{ name }}</option>
+            </select>
+        </div>
+
+        <!-- 新增代码：显示天气信息的表格 -->
+        <table v-if="weather">
+            <tr>
+                <th>日期</th>
+                <th>温度</th>
+                <th>描述</th>
+            </tr>
+            <tr v-for="dailyWeather in weather.dailyWeatherList">
+                <td>{{ dailyWeather.data }}</td>
+                <td>{{ dailyWeather.temperature }}</td>
+                <td>{{ dailyWeather.description }}</td>
+            </tr>
+        </table>
+
+        <!-- 新增代码：显示general、advice 和 uv 信息 -->
+        <div v-if="weather">
+            <p><strong>实况：</strong>{{ weather.general }}</p>
+            <p><strong>建议：</strong>{{ weather.advice }}</p>
+            <p><strong>紫外线指数：</strong>{{ weather.uv }}</p>
+        </div>
+    </center>
+</div>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            regions: [
+                { name: '黑龙江', code: '3113' },
+                { name: '吉林', code: '3114' },
+                { name: '辽宁', code: '3115' },
+                { name: '内蒙古', code: '3116' },
+                { name: '河北', code: '3117' },
+                { name: '河南', code: '3118' },
+                { name: '山东', code: '3119' },
+                { name: '山西', code: '31110' },
+                { name: '江苏', code: '31111' },
+                { name: '安徽', code: '31112' },
+                { name: '陕西', code: '31113' },
+                { name: '宁夏', code: '31114' },
+                { name: '甘肃', code: '31115' },
+                { name: '青海', code: '31116' },
+                { name: '湖北', code: '31117' },
+                { name: '湖南', code: '31118' },
+                { name: '浙江', code: '31119' },
+                { name: '江西', code: '31120' },
+                { name: '福建', code: '31121' },
+                { name: '贵州', code: '31122' },
+                { name: '四川', code: '31123' },
+                { name: '广东', code: '31124' },
+                { name: '广西', code: '31125' },
+                { name: '云南', code: '31126' },
+                { name: '海南', code: '31127' },
+                { name: '新疆', code: '31128' },
+                { name: '西藏', code: '31129' },
+                { name: '台湾', code: '31130' },
+                { name: '北京', code: '311101' },
+                { name: '上海', code: '311102' },
+                { name: '天津', code: '311103' },
+                { name: '重庆', code: '311104' },
+                { name: '香港', code: '311201' },
+                { name: '澳门', code: '311202' },
+                { name: '钓鱼岛', code: '311203' }
+            ],
+            cities: [],
+            selectedRegion: null,
+            selectedCity: null,
+            weather: null
+        },
+        methods: {
+            getCityList() {
+                axios.post("http://localhost:8080/getcities", {selectedRegion: this.selectedRegion})
+                    .then(response => {
+                        document.getElementById("cities-container").style.display = "block";
+                        this.cities = response.data;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            },
+            getWeatherByCityCode() {
+                axios.post("http://localhost:8080/getWeather", {selectedCity: this.selectedCity})
+                    .then(response => {
+                        document.getElementById("cities-container").style.display = "block";
+                        this.weather = response.data;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        }
+    });
+</script>
+</body>
+</html>

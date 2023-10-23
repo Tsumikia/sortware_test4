@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>个人所得税计算</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #app {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        input {
+            padding: 8px;
+            margin-right: 8px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        div {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <center>
+        <label for="salary">您的工资:</label>
+        <input id="salary" v-model="salary" type="number" min="0">
+        <button @click="taxCalculate">计算</button>
+        <div v-if="tax !== -1">
+            您所需要缴纳的个人所得税为: {{tax}}元
+        </div>
+    </center>
+</div>
+
+<script>
+    new Vue({
+        el: "#app",
+        data: {
+            salary: "",
+            tax: -1
+        },
+        methods: {
+            taxCalculate() {
+                axios.get('http://localhost:8080/tax?salary='+this.salary)
+                    .then(response => {
+                        this.tax = response.data;
+                    })
+                    .catch(error => {
+                        console.error('Error calculating tax:', error);
+                    });
+            }
+        }
+    })
+</script>
+</body>
+</html>
